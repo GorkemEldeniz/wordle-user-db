@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test</title>
+</head>
+
+<body>
+  <form class="form">
+    <input type="text" name="username" class="username" autocomplete="off">
+    <br />
+    <input type="text" name="password" class="password" autocomplete="off">
+    <br />
+    <input type="file" name="avatar" class="file" accept=".png, .jpg, .jpeg">
+    <br>
+    <button type="submit">Submit</button>
+  </form>
+  <h1 class="title"></h1>
+  <img class="avatar" src="" alt="">
+
+  <!-- <form action="" class="form">
+    <input type="text" name="username">
+    <br />
+    <input type="text" name="password">
+    <br />
+    <br>
+    <button type="submit">Submit</button>
+  </form> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+    integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="module">
+    const form = document.querySelector('.form');
+    const title = document.querySelector('.title');
+    const image = document.querySelector('.avatar');
+    const fileInput = document.querySelector('.file');
+    const username = document.querySelector('.username');
+    const password = document.querySelector('.password');
+
+
+    window.addEventListener('load', e => {
+      if (localStorage.getItem('user')) {
+        const { username, avatar } = JSON.parse(localStorage.getItem('user'))
+        title.textContent = username;
+        image.src = avatar;
+        form.style.display = 'none';
+      }
+    })
+
+    const createUser = async (user) => {
+      const response = await axios.post('http://localhost:3001/create', user, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data) {
+        console.log('Kullanıcı oluşturuldu:', response.data);
+      } else {
+        console.error('Kullanıcı oluşturma hatası:', response.status);
+      }
+    };
+
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('username', username.value);
+      formData.append('password', password.value);
+      formData.append('avatar', fileInput.files[0]);
+
+      await createUser(formData)
+    })
+  </script>
+</body>
+
+</html>
